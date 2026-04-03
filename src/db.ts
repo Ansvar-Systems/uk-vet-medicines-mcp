@@ -65,7 +65,8 @@ function initSchema(db: BetterSqlite3.Database): void {
       period_days INTEGER NOT NULL,
       notes TEXT,
       zero_day_allowed INTEGER DEFAULT 0,
-      jurisdiction TEXT NOT NULL DEFAULT 'GB'
+      jurisdiction TEXT NOT NULL DEFAULT 'GB',
+      UNIQUE(medicine_id, species, product_type, jurisdiction)
     );
 
     CREATE TABLE IF NOT EXISTS banned_substances (

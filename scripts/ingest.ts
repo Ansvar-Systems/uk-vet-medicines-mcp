@@ -1832,7 +1832,36 @@ function seedWithdrawalPeriods(db: Database): number {
     stmt.run(p.medicine_id, p.species, p.product_type, p.period_days, p.notes, p.zero_day);
   }
 
-  return periods.length;
+  // Load VMD-scraped withdrawal periods (extracted from SPC PDFs by scrape-vmd-withdrawal-periods.py).
+  // Uses INSERT OR IGNORE so curated entries above always take priority.
+  const vmdWpPath = join(__dirname, '..', 'data', 'vmd-withdrawal-periods.json');
+  let vmdWpCount = 0;
+  try {
+    const vmdWpRaw = readFileSync(vmdWpPath, 'utf-8');
+    const vmdWp: Array<{
+      medicine_id: string; species: string; product_type: string;
+      period_days: number; notes: string | null; zero_day_allowed: number;
+    }> = JSON.parse(vmdWpRaw);
+
+    const stmtIgnore = db.instance.prepare(
+      `INSERT OR IGNORE INTO withdrawal_periods (medicine_id, species, product_type, period_days, notes, zero_day_allowed, jurisdiction)
+       VALUES (?, ?, ?, ?, ?, ?, 'GB')`
+    );
+
+    for (const wp of vmdWp) {
+      const result = stmtIgnore.run(
+        wp.medicine_id, wp.species, wp.product_type,
+        wp.period_days, wp.notes, wp.zero_day_allowed
+      );
+      if (result.changes > 0) vmdWpCount++;
+    }
+
+    console.log(`  VMD-scraped withdrawal periods loaded: ${vmdWpCount} (from ${vmdWp.length} entries)`);
+  } catch {
+    console.warn('  WARNING: vmd-withdrawal-periods.json not found — skipping VMD withdrawal data');
+  }
+
+  return periods.length + vmdWpCount;
 }
 
 function seedBannedSubstances(db: Database): number {
