@@ -1,0 +1,30 @@
+{
+  "name": "UK Vet Medicines MCP",
+  "description": "UK veterinary medicines via MCP — VMD authorised products, withdrawal periods, cascade rules, banned substances",
+  "vendor": "Ansvar Systems",
+  "sourceUrl": "https://github.com/Ansvar-Systems/uk-vet-medicines-mcp",
+  "homepage": "https://ansvar.eu/open-agriculture",
+  "license": "Apache-2.0",
+  "runtime": "node",
+  "tools": [
+    "about",
+    "list_sources",
+    "check_data_freshness",
+    "search_authorised_medicines",
+    "get_medicine_details",
+    "get_withdrawal_period",
+    "check_cascade_rules",
+    "get_medicine_record_requirements",
+    "search_by_active_substance",
+    "get_banned_substances"
+  ],
+  "transports": {
+    "stdio": {
+      "command": "npx",
+      "args": ["-y", "@ansvar/uk-vet-medicines-mcp"]
+    },
+    "streamableHttp": {
+      "url": "https://mcp.ansvar.eu/uk-vet-medicines/mcp"
+    }
+  }
+}

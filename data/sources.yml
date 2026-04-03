@@ -1,0 +1,61 @@
+schema_version: "1.0"
+mcp_name: "UK Vet Medicines MCP"
+category: "domain_intelligence"
+
+sources:
+  - name: "VMD Product Information Database"
+    authority: "Veterinary Medicines Directorate"
+    official_url: "https://www.vmd.defra.gov.uk/productinformationdatabase/"
+    api_url: null
+    retrieval_method: "HTML_SCRAPE"
+    format: "HTML"
+    authentication: "none"
+    update_frequency: "monthly"
+    license:
+      type: "Open Government Licence"
+      url: "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+      summary: "Free to copy, publish, distribute, and adapt with attribution"
+    coverage:
+      scope: "Authorised veterinary medicines with SPC data, withdrawal periods, species, legal categories"
+      version: "current"
+      item_count: "~20 curated products (full DB has thousands)"
+    languages:
+      - "en"
+
+  - name: "Veterinary Medicines Regulations 2013"
+    authority: "UK Government (DEFRA)"
+    official_url: "https://www.legislation.gov.uk/uksi/2013/2033/contents"
+    api_url: null
+    retrieval_method: "MANUAL_REVIEW"
+    format: "HTML"
+    authentication: "none"
+    update_frequency: "as_amended"
+    license:
+      type: "Open Government Licence"
+      url: "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+      summary: "Free to copy, publish, distribute, and adapt with attribution"
+    coverage:
+      scope: "Cascade prescribing rules, banned substances, record-keeping requirements"
+      version: "SI 2013/2033 as amended"
+      item_count: "5 cascade steps, 12 banned substances, 6 record requirements"
+    languages:
+      - "en"
+
+  - name: "DEFRA Veterinary Cascade Guidance"
+    authority: "Department for Environment, Food and Rural Affairs"
+    official_url: "https://www.gov.uk/guidance/the-cascade-prescribing-unauthorised-medicines"
+    api_url: null
+    retrieval_method: "MANUAL_REVIEW"
+    format: "HTML"
+    authentication: "none"
+    update_frequency: "as_amended"
+    license:
+      type: "Open Government Licence"
+      url: "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+      summary: "Free to copy, publish, distribute, and adapt with attribution"
+    coverage:
+      scope: "Cascade step order, default withdrawal periods, documentation requirements"
+      version: "current"
+      item_count: "5 cascade steps with documentation rules"
+    languages:
+      - "en"

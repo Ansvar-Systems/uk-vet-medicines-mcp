@@ -1,0 +1,11 @@
+{
+  "mcp_name": "UK Vet Medicines MCP",
+  "jurisdiction": "GB",
+  "build_date": "2026-04-03",
+  "medicines": 20,
+  "withdrawal_periods": 52,
+  "banned_substances": 12,
+  "cascade_rules": 5,
+  "record_requirements": 6,
+  "fts_entries": 33
+}
