@@ -2158,6 +2158,7 @@ function main(): void {
   const today = new Date().toISOString().split('T')[0];
   db.run("INSERT OR REPLACE INTO db_metadata (key, value) VALUES ('last_ingest', ?)", [today]);
   db.run("INSERT OR REPLACE INTO db_metadata (key, value) VALUES ('build_date', ?)", [today]);
+  db.run("INSERT OR REPLACE INTO db_metadata (key, value) VALUES ('schema_version', '1.1')", []);
 
   // Write coverage.json
   const coverage = {
