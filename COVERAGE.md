@@ -2,8 +2,8 @@
 
 ## What Is Included
 
-- **VMD-authorised veterinary medicines** -- 20+ products with MA numbers, active substances, species, pharmaceutical forms, legal categories, and MA holders
-- **Withdrawal periods** -- 50+ entries covering meat and milk withdrawal times for each medicine/species combination. Includes zero-day products and "not authorised for dairy" restrictions
+- **VMD-authorised veterinary medicines** -- 105 products with MA numbers, active substances, species, pharmaceutical forms, legal categories, and MA holders. Covers antibiotics, anti-parasitics, anti-inflammatories, intramammary preparations, vaccines, reproductive hormones, and supportive treatments.
+- **Withdrawal periods** -- 238 entries covering meat and milk withdrawal times for each medicine/species combination. Includes zero-day products and "not authorised for dairy" restrictions
 - **Banned substances** -- 12 prohibited substances/classes with applicable species and regulation references
 - **Cascade prescribing rules** -- 5-step cascade with documentation requirements and default statutory withdrawal periods
 - **Record-keeping requirements** -- 6 obligation types covering food-producing and non-food animal holdings

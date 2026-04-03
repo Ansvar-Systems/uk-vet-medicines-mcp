@@ -5,3 +5,5 @@ dist/
 .env
 .env.local
 coverage/
+data/vmd-products.json
+data/vmd-source-hash.json
