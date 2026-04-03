@@ -51,6 +51,7 @@ function initSchema(db: BetterSqlite3.Database): void {
       pharmaceutical_form TEXT,
       legal_category TEXT,
       ma_holder TEXT,
+      therapeutic_group TEXT,
       spc_url TEXT,
       status TEXT,
       jurisdiction TEXT NOT NULL DEFAULT 'GB'
@@ -106,7 +107,7 @@ function initSchema(db: BetterSqlite3.Database): void {
       value TEXT
     );
 
-    INSERT OR IGNORE INTO db_metadata (key, value) VALUES ('schema_version', '1.0');
+    INSERT OR IGNORE INTO db_metadata (key, value) VALUES ('schema_version', '1.1');
     INSERT OR IGNORE INTO db_metadata (key, value) VALUES ('mcp_name', 'UK Vet Medicines MCP');
     INSERT OR IGNORE INTO db_metadata (key, value) VALUES ('jurisdiction', 'GB');
   `);

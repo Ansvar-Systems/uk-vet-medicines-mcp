@@ -2,10 +2,13 @@
   "mcp_name": "UK Vet Medicines MCP",
   "jurisdiction": "GB",
   "build_date": "2026-04-03",
-  "medicines": 105,
+  "medicines": 1305,
+  "curated_medicines": 105,
+  "vmd_bulk_products": 1200,
   "withdrawal_periods": 238,
   "banned_substances": 12,
   "cascade_rules": 5,
   "record_requirements": 6,
-  "fts_entries": 118
+  "fts_entries": 1318,
+  "data_source": "VMD Product Information Database (bulk) + curated SPC withdrawal periods"
 }

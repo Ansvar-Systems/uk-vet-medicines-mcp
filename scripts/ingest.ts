@@ -14,7 +14,7 @@
 import { createDatabase, type Database } from '../src/db.js';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DB_PATH = join(__dirname, '..', 'data', 'database.db');
@@ -1300,17 +1300,66 @@ function seedMedicines(db: Database): number {
 
   const stmt = db.instance.prepare(
     `INSERT OR REPLACE INTO medicines (id, product_name, ma_number, active_substances, species_authorised,
-     pharmaceutical_form, legal_category, ma_holder, spc_url, status, jurisdiction)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'GB')`
+     pharmaceutical_form, legal_category, ma_holder, therapeutic_group, spc_url, status, jurisdiction)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'GB')`
   );
 
   for (const m of medicines) {
     stmt.run(m.id, m.product_name, m.ma_number, m.active_substances,
       m.species_authorised, m.pharmaceutical_form, m.legal_category,
-      m.ma_holder, m.spc_url, m.status);
+      m.ma_holder, null, m.spc_url, m.status);
   }
 
   return medicines.length;
+}
+
+/**
+ * Load VMD bulk product data from vmd-products.json and insert products
+ * that are not already in the database (curated medicines take priority).
+ */
+function seedVmdProducts(db: Database): number {
+  const vmdPath = join(__dirname, '..', 'data', 'vmd-products.json');
+  let vmdProducts: Array<{
+    id: string;
+    product_name: string;
+    ma_number: string;
+    active_substances: string;
+    species_authorised: string;
+    pharmaceutical_form: string;
+    legal_category: string;
+    ma_holder: string;
+    therapeutic_group?: string;
+    spc_url?: string;
+    status: string;
+  }>;
+
+  try {
+    const raw = readFileSync(vmdPath, 'utf-8');
+    vmdProducts = JSON.parse(raw);
+  } catch {
+    console.warn('  WARNING: vmd-products.json not found — skipping VMD bulk import');
+    return 0;
+  }
+
+  const stmt = db.instance.prepare(
+    `INSERT OR IGNORE INTO medicines (id, product_name, ma_number, active_substances, species_authorised,
+     pharmaceutical_form, legal_category, ma_holder, therapeutic_group, spc_url, status, jurisdiction)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'GB')`
+  );
+
+  let inserted = 0;
+  for (const p of vmdProducts) {
+    const result = stmt.run(
+      p.id, p.product_name, p.ma_number, p.active_substances,
+      p.species_authorised, p.pharmaceutical_form, p.legal_category,
+      p.ma_holder, p.therapeutic_group || null,
+      p.spc_url || 'https://www.vmd.defra.gov.uk/productinformationdatabase/',
+      p.status
+    );
+    if (result.changes > 0) inserted++;
+  }
+
+  return inserted;
 }
 
 function seedWithdrawalPeriods(db: Database): number {
@@ -1994,9 +2043,9 @@ function seedSearchIndex(db: Database): number {
   const medicines = db.all<{
     id: string; product_name: string; active_substances: string;
     species_authorised: string; pharmaceutical_form: string; legal_category: string;
-    ma_holder: string;
+    ma_holder: string; therapeutic_group: string | null;
   }>(
-    'SELECT id, product_name, active_substances, species_authorised, pharmaceutical_form, legal_category, ma_holder FROM medicines WHERE jurisdiction = ?',
+    'SELECT id, product_name, active_substances, species_authorised, pharmaceutical_form, legal_category, ma_holder, therapeutic_group FROM medicines WHERE jurisdiction = ?',
     ['GB']
   );
 
@@ -2012,7 +2061,8 @@ function seedSearchIndex(db: Database): number {
     );
 
     let body = `${m.product_name} (${m.active_substances}). ${m.pharmaceutical_form}. ` +
-      `Legal category: ${m.legal_category}. MA holder: ${m.ma_holder}.`;
+      `Legal category: ${m.legal_category}. MA holder: ${m.ma_holder}.` +
+      (m.therapeutic_group ? ` Therapeutic group: ${m.therapeutic_group}.` : '');
 
     if (periods.length > 0) {
       body += ' Withdrawal periods: ' + periods.map(p => {
@@ -2072,8 +2122,22 @@ function main(): void {
   db.run('DELETE FROM record_requirements', []);
   db.run('DELETE FROM medicines', []);
 
-  const medicineCount = seedMedicines(db);
-  console.log(`  Medicines: ${medicineCount}`);
+  // Migrate schema: add therapeutic_group if missing
+  const cols = db.all<{ name: string }>("PRAGMA table_info('medicines')");
+  const hasTherapeuticGroup = cols.some(c => c.name === 'therapeutic_group');
+  if (!hasTherapeuticGroup) {
+    db.run('ALTER TABLE medicines ADD COLUMN therapeutic_group TEXT', []);
+    console.log('  Schema migration: added therapeutic_group column');
+  }
+
+  const curatedCount = seedMedicines(db);
+  console.log(`  Curated medicines: ${curatedCount}`);
+
+  const vmdCount = seedVmdProducts(db);
+  console.log(`  VMD bulk products added: ${vmdCount}`);
+
+  const medicineCount = db.get<{ c: number }>('SELECT COUNT(*) as c FROM medicines')!.c;
+  console.log(`  Total medicines: ${medicineCount}`);
 
   const withdrawalCount = seedWithdrawalPeriods(db);
   console.log(`  Withdrawal periods: ${withdrawalCount}`);
@@ -2101,11 +2165,14 @@ function main(): void {
     jurisdiction: 'GB',
     build_date: today,
     medicines: medicineCount,
+    curated_medicines: curatedCount,
+    vmd_bulk_products: vmdCount,
     withdrawal_periods: withdrawalCount,
     banned_substances: bannedCount,
     cascade_rules: cascadeCount,
     record_requirements: recordCount,
     fts_entries: ftsCount,
+    data_source: 'VMD Product Information Database (bulk) + curated SPC withdrawal periods',
   };
 
   writeFileSync(COVERAGE_PATH, JSON.stringify(coverage, null, 2) + '\n');
