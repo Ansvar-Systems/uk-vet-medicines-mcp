@@ -1,4 +1,5 @@
 import { buildMeta } from '../metadata.js';
+import { buildCitation } from '../citation.js';
 import { validateJurisdiction } from '../jurisdiction.js';
 import type { Database } from '../db.js';
 
@@ -42,5 +43,12 @@ export function handleCheckCascadeRules(db: Database, args: CascadeArgs) {
     _meta: buildMeta({
       source_url: 'https://www.gov.uk/guidance/the-cascade-prescribing-unauthorised-medicines',
     }),
+    _citation: buildCitation(
+      `UK Cascade Rules: ${args.species}`,
+      `Cascade prescribing rules for ${args.species} — ${args.condition} (${jv.jurisdiction})`,
+      'check_cascade_rules',
+      { species: args.species, condition: args.condition },
+      'https://www.gov.uk/guidance/the-cascade-prescribing-unauthorised-medicines',
+    ),
   };
 }
