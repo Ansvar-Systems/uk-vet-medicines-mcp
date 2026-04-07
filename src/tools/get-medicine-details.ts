@@ -1,4 +1,5 @@
 import { buildMeta } from '../metadata.js';
+import { buildCitation } from '../citation.js';
 import { validateJurisdiction } from '../jurisdiction.js';
 import type { Database } from '../db.js';
 
@@ -47,5 +48,12 @@ export function handleGetMedicineDetails(db: Database, args: MedicineDetailsArgs
     _meta: buildMeta({
       source_url: medicine.spc_url || 'https://www.vmd.defra.gov.uk/productinformationdatabase/',
     }),
+    _citation: buildCitation(
+      `UK Medicine: ${medicine.product_name}`,
+      `${medicine.product_name} (MA ${medicine.ma_number})`,
+      'get_medicine_details',
+      { medicine_id: args.medicine_id },
+      medicine.spc_url || 'https://www.vmd.defra.gov.uk/productinformationdatabase/',
+    ),
   };
 }

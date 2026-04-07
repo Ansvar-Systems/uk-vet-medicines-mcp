@@ -1,4 +1,5 @@
 import { buildMeta } from '../metadata.js';
+import { buildCitation } from '../citation.js';
 import { validateJurisdiction } from '../jurisdiction.js';
 import type { Database } from '../db.js';
 
@@ -49,5 +50,12 @@ export function handleGetMedicineRecordRequirements(db: Database, args: RecordRe
     _meta: buildMeta({
       source_url: 'https://www.legislation.gov.uk/uksi/2013/2033/contents',
     }),
+    _citation: buildCitation(
+      `UK Medicine Record Requirements`,
+      `Medicine record-keeping requirements (${jv.jurisdiction})`,
+      'get_medicine_record_requirements',
+      { ...(args.species && { species: args.species }), ...(args.holding_type && { holding_type: args.holding_type }) },
+      'https://www.legislation.gov.uk/uksi/2013/2033/contents',
+    ),
   };
 }

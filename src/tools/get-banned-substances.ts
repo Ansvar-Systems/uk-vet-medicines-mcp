@@ -1,4 +1,5 @@
 import { buildMeta } from '../metadata.js';
+import { buildCitation } from '../citation.js';
 import { validateJurisdiction } from '../jurisdiction.js';
 import type { Database } from '../db.js';
 
@@ -52,5 +53,12 @@ export function handleGetBannedSubstances(db: Database, args: BannedSubstancesAr
     _meta: buildMeta({
       source_url: 'https://www.legislation.gov.uk/uksi/2013/2033/contents',
     }),
+    _citation: buildCitation(
+      `UK Banned Veterinary Substances`,
+      `Banned substances in veterinary medicines (${jv.jurisdiction})`,
+      'get_banned_substances',
+      { ...(args.species && { species: args.species }) },
+      'https://www.legislation.gov.uk/uksi/2013/2033/contents',
+    ),
   };
 }
